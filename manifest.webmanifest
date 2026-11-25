@@ -1,0 +1,38 @@
+{
+  "name": "عقدي — عقدك القانوني في دقائق",
+  "short_name": "عقدي",
+  "description": "أنشئ عقود خدمات وإيجار وشراكة وعمل وإقرار استلام بالعربي، من غير إنترنت، وبياناتك على جهازك فقط.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F9F6EF",
+  "theme_color": "#1B2A4A",
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
