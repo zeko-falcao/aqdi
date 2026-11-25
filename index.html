@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عقدي — عقدك القانوني في دقائق</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1B2A4A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="عقدي">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<style>
+:root{
+  --navy:#1B2A4A; --navy-dark:#131F38; --gold:#C9A227; --gold-dark:#A8871E;
+  --paper:#F9F6EF; --card:#FFFFFF; --muted:#5B6478; --line:#E6E0D2; --ink:#182338;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--paper);color:var(--ink);line-height:1.7}
+.app-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:var(--navy);color:#fff;padding:12px 20px}
+.app-bar .brand{font-size:26px;font-weight:800;color:var(--gold)}
+.app-bar .brand small{display:block;font-size:12px;font-weight:400;color:#c9d3e6}
+.type-chip{background:var(--gold);color:var(--navy-dark);border-radius:999px;padding:6px 16px;font-weight:700;font-size:14px}
+.disclaimer{background:#FFF7E0;border-bottom:1px solid #EED98F;color:#6B5410;padding:8px 20px;font-size:13px;text-align:center}
+.layout{display:grid;grid-template-columns:minmax(340px,470px) 1fr;gap:20px;padding:20px;max-width:1320px;margin:0 auto}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(24,35,56,.06)}
+.panel h3{font-size:15px;color:var(--navy);margin-bottom:10px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
+.field label i{color:#B3261E;font-style:normal}
+.field input,.field textarea,.field select{
+  width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;
+  font-family:inherit;background:#fff;color:var(--ink);
+}
+.field input:focus,.field textarea:focus,.field select:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+#type-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:480px){#type-picker{grid-template-columns:1fr}}
+.type-card{
+  border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;cursor:pointer;
+  text-align:right;font-family:inherit;
+}
+.type-card b{display:block;font-size:14px;color:var(--navy)}
+.type-card span{display:block;font-size:12px;color:var(--muted)}
+.type-card.active{border-color:var(--gold);background:#FFFDF4;box-shadow:0 0 0 1px var(--gold)}
+.btn{display:inline-block;border:none;border-radius:10px;padding:11px 18px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:var(--navy-dark)}
+.btn-gold{background:var(--gold);color:var(--navy-dark)}
+.btn-gold:hover{background:var(--gold-dark)}
+.btn-ghost{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+.btn-block{width:100%;margin-top:8px}
+.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:3px 10px;cursor:pointer;font-family:inherit}
+.mini:hover{background:var(--paper)}
+.muted{color:var(--muted);font-size:13px}
+.draft-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.draft-row:last-child{border-bottom:none}
+#toast{position:fixed;bottom:24px;right:50%;transform:translateX(50%);background:var(--navy);color:#fff;padding:10px 22px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+#toast.show{opacity:1}
+#toast.err{background:#B3261E}
+/* ---------- ورقة العقد ---------- */
+.preview-wrap{position:sticky;top:16px}
+#contract-paper{
+  background:#fff;border:1px solid var(--line);border-radius:6px;
+  padding:42px 46px;min-height:600px;box-shadow:0 4px 18px rgba(24,35,56,.10);
+  font-family:"Traditional Arabic","Simplified Arabic","Times New Roman",serif;
+}
+.c-title{text-align:center;font-size:24px;color:var(--navy);border-bottom:2px solid var(--gold);padding-bottom:12px;margin-bottom:18px}
+.c-p{font-size:16px;margin-bottom:12px;text-align:justify}
+.c-clause{margin-bottom:14px}
+.c-clause h3{font-size:16px;color:var(--navy);margin-bottom:3px}
+.c-clause p{font-size:15.5px;text-align:justify}
+.c-sign{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:34px;font-size:16px;font-weight:700;color:var(--navy)}
+.c-note{margin-top:30px;border-top:1px dashed var(--line);padding-top:10px;font-size:12px;color:var(--muted);text-align:center;font-family:"Segoe UI",Tahoma,Arial,sans-serif}
+@media (max-width:600px){
+  #contract-paper{padding:20px 16px}
+  .c-title{font-size:20px}
+  .c-p{font-size:14px}
+  .c-clause p{font-size:13.5px}
+  .c-sign{flex-direction:column}
+}
+/* ---------- طباعة ---------- */
+@media print{
+  body{background:#fff}
+  .app-bar,.disclaimer,.form-col,#toast{display:none !important}
+  .layout{display:block;padding:0;max-width:none}
+  .preview-wrap{position:static}
+  #contract-paper{border:none;box-shadow:none;border-radius:0;padding:8mm;min-height:auto}
+  @page{size:A4;margin:14mm}
+}
+</style>
+</head>
+<body>
+<header class="app-bar">
+  <div class="brand">عقدي <small>عقدك القانوني في دقائق — بدون تسجيل</small></div>
+  <div class="type-chip" id="stat-type"></div>
+</header>
+<div class="disclaimer">النماذج استرشادية عامة ولا تُغني عن مراجعة محامٍ مختص قبل التوقيع. بياناتك تُحفظ على جهازك فقط.</div>
+
+<main class="layout">
+  <div class="form-col">
+    <section class="panel">
+      <h3>اختر نوع العقد</h3>
+      <div id="type-picker"></div>
+    </section>
+
+    <section class="panel">
+      <h3>بيانات العقد</h3>
+      <div id="fields-form"></div>
+    </section>
+
+    <section class="panel">
+      <h3>إجراءات</h3>
+      <button type="button" class="btn btn-gold btn-block" id="btn-print">طباعة / حفظ PDF</button>
+      <button type="button" class="btn btn-primary btn-block" id="btn-copy">نسخ النص (للصقه في Word)</button>
+      <button type="button" class="btn btn-ghost btn-block" id="btn-save-draft">حفظ كمسودة</button>
+      <button type="button" class="btn btn-ghost btn-block" id="btn-new">عقد جديد</button>
+    </section>
+
+    <section class="panel">
+      <h3>المسودات (على جهازك فقط)</h3>
+      <div id="drafts"></div>
+    </section>
+  </div>
+
+  <div>
+    <div class="preview-wrap">
+      <div id="contract-paper"></div>
+    </div>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<script>/* عقدي (Aqdi) - محرك توليد العقود. يعمل في المتصفح وفي Node للاختبارات. */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.AqdiEngine = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  var AR_NUM = ['الأول','الثاني','الثالث','الرابع','الخامس','السادس','السابع','الثامن','التاسع','العاشر','الحادي عشر','الثاني عشر','الثالث عشر','الرابع عشر','الخامس عشر'];
+
+  function str(v) { return String(v == null ? '' : v).trim(); }
+  function money(n) {
+    var v = Number(n);
+    if (!isFinite(v) || v < 0) v = 0;
+    return v.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+  function val(answers, id, fallback) {
+    var v = str(answers && answers[id]);
+    return v || fallback || '__________';
+  }
+
+  /* تعريف الحقول لكل نوع عقد */
+  var TYPES = {
+    services: {
+      name: 'عقد تقديم خدمات',
+      desc: 'للفريلانسر ومقدمي الخدمات مع عملائهم',
+      fields: [
+        { id:'providerName', label:'اسم مقدم الخدمة (الطرف الأول)', required:true, placeholder:'الاسم الكامل' },
+        { id:'providerId', label:'رقم بطاقته / سجله', placeholder:'رقم قومي أو سجل تجاري' },
+        { id:'clientName', label:'اسم العميل (الطرف الثاني)', required:true },
+        { id:'clientId', label:'رقم بطاقته / سجله' },
+        { id:'serviceDesc', label:'وصف الخدمات المتفق عليها', type:'textarea', required:true, placeholder:'مثال: تصميم هوية بصرية كاملة تشمل الشعار والمطبوعات' },
+        { id:'fee', label:'المقابل المادي الإجمالي (جنيه)', type:'number', required:true },
+        { id:'paymentTerms', label:'طريقة السداد', type:'select', options:['دفعة مقدمة 50% والباقي عند التسليم','كاملة مقدمًا','كاملة عند التسليم','دفعات شهرية متساوية'], required:true },
+        { id:'durationDays', label:'مدة التنفيذ (بالأيام)', type:'number', required:true },
+        { id:'revisions', label:'عدد مرات التعديل المجانية', type:'number', placeholder:'اختياري' },
+        { id:'city', label:'المحافظة', required:true, placeholder:'القاهرة' },
+        { id:'contractDate', label:'تاريخ التحرير', type:'date', required:true }
+      ]
+    },
+    rent: {
+      name: 'عقد إيجار سكني',
+      desc: 'إيجار شقة أو وحدة سكنية',
+      fields: [
+        { id:'landlordName', label:'اسم المؤجر (الطرف الأول)', required:true },
+        { id:'landlordId', label:'رقم بطاقته' },
+        { id:'tenantName', label:'اسم المستأجر (الطرف الثاني)', required:true },
+        { id:'tenantId', label:'رقم بطاقته' },
+        { id:'propertyAddress', label:'عنوان العين المؤجرة', type:'textarea', required:true },
+        { id:'propertyDesc', label:'وصف العين', placeholder:'مثال: شقة سكنية بالدور الثالث مساحة 120 م²' },
+        { id:'rentAmount', label:'القيمة الإيجارية الشهرية (جنيه)', type:'number', required:true },
+        { id:'deposit', label:'مبلغ التأمين (جنيه)', type:'number', placeholder:'اختياري' },
+        { id:'durationMonths', label:'مدة الإيجار (بالشهور)', type:'number', required:true },
+        { id:'startDate', label:'تاريخ بدء الإيجار', type:'date', required:true },
+        { id:'utilities', label:'المرافق (كهرباء/ماء/غاز)', type:'select', options:['على حساب المستأجر','مشمولة في الإيجار'], required:true },
+        { id:'city', label:'المحافظة', required:true },
+        { id:'contractDate', label:'تاريخ التحرير', type:'date', required:true }
+      ]
+    },
+    nda: {
+      name: 'اتفاقية عدم إفصاح (سرية)',
+      desc: 'حماية المعلومات قبل التعاون أو التفاوض',
+      fields: [
+        { id:'discloserName', label:'الطرف المُفصح (الطرف الأول)', required:true },
+        { id:'discloserId', label:'رقم بطاقته / سجله' },
+        { id:'recipientName', label:'الطرف المتلقي (الطرف الثاني)', required:true },
+        { id:'recipientId', label:'رقم بطاقته / سجله' },
+        { id:'mutual', label:'نطاق الالتزام', type:'select', options:['من طرف واحد (على المتلقي فقط)','متبادل (على الطرفين)'], required:true },
+        { id:'purpose', label:'الغرض من الإفصاح', required:true, placeholder:'مثال: دراسة شراكة تجارية محتملة' },
+        { id:'durationYears', label:'مدة الالتزام بالسرية (بالسنوات)', type:'number', required:true },
+        { id:'city', label:'المحافظة', required:true },
+        { id:'contractDate', label:'تاريخ التحرير', type:'date', required:true }
+      ]
+    },
+    partnership: {
+      name: 'عقد شراكة بسيط',
+      desc: 'شراكة بين شخصين في نشاط تجاري',
+      fields: [
+        { id:'partner1Name', label:'اسم الشريك الأول', required:true },
+        { id:'partner1Id', label:'رقم بطاقته' },
+        { id:'partner2Name', label:'اسم الشريك الثاني', required:true },
+        { id:'partner2Id', label:'رقم بطاقته' },
+        { id:'businessName', label:'اسم النشاط / المشروع', required:true },
+        { id:'businessActivity', label:'وصف النشاط', required:true, placeholder:'مثال: تجارة وتوزيع منتجات غذائية' },
+        { id:'capital', label:'رأس المال الإجمالي (جنيه)', type:'number', required:true },
+        { id:'share1', label:'حصة الشريك الأول %', type:'number', required:true },
+        { id:'share2', label:'حصة الشريك الثاني %', type:'number', required:true },
+        { id:'profitSplit', label:'توزيع الأرباح', type:'select', options:['بنسبة حصص رأس المال','بالتساوي بين الشريكين'], required:true },
+        { id:'city', label:'المحافظة', required:true },
+        { id:'contractDate', label:'تاريخ التحرير', type:'date', required:true }
+      ]
+    },
+    employment: {
+      name: 'عقد عمل محدد المدة',
+      desc: 'توظيف بدوام كامل بمدة محددة',
+      fields: [
+        { id:'employerName', label:'اسم صاحب العمل (الطرف الأول)', required:true },
+        { id:'employerId', label:'رقم سجله / بطاقته' },
+        { id:'employeeName', label:'اسم الموظف (الطرف الثاني)', required:true },
+        { id:'employeeId', label:'رقم بطاقته' },
+        { id:'jobTitle', label:'المسمى الوظيفي', required:true },
+        { id:'jobDesc', label:'طبيعة العمل ومهامه', type:'textarea', required:true },
+        { id:'salary', label:'الراتب الشهري (جنيه)', type:'number', required:true },
+        { id:'durationMonths', label:'مدة العقد (بالشهور)', type:'number', required:true },
+        { id:'probationMonths', label:'فترة التجربة (بالشهور)', type:'number', placeholder:'اختياري - بحد أقصى 3' },
+        { id:'startDate', label:'تاريخ بدء العمل', type:'date', required:true },
+        { id:'city', label:'المحافظة', required:true },
+        { id:'contractDate', label:'تاريخ التحرير', type:'date', required:true }
+      ]
+    }
+  };
+
+  function validate(typeId, answers) {
+    var t = TYPES[typeId];
+    if (!t) return ['نوع عقد غير معروف'];
+    var errors = [];
+    t.fields.forEach(function (f) {
+      if (f.required && !str(answers && answers[f.id])) errors.push('حقل مطلوب: ' + f.label);
+    });
+    if (typeId === 'partnership') {
+      var s1 = Number(answers.share1), s2 = Number(answers.share2);
+      if (isFinite(s1) && isFinite(s2) && str(answers.share1) && str(answers.share2) && s1 + s2 !== 100)
+        errors.push('حصص الشركاء يجب أن تكون مجموعها 100% (الآن: ' + (s1 + s2) + '%)');
+    }
+    if (typeId === 'employment') {
+      var p = Number(answers.probationMonths);
+      if (str(answers.probationMonths) && isFinite(p) && p > 3)
+        errors.push('فترة التجربة لا تتجاوز 3 أشهر قانونًا');
+    }
+    return errors;
+  }
+
+  function preamble(title, p1label, p1, p2label, p2, a) {
+    return [
+      { kind:'title', text: title },
+      { kind:'p', text:'إنه في يوم الموافق ' + val(a,'contractDate') + ' حُرر هذا العقد بمحافظة ' + val(a,'city') + ' بين كلٍّ من:' },
+      { kind:'p', text:'أولًا: ' + val(a,p1.name) + (str(a[p1.id]) ? ' — رقم ' + str(a[p1.id]) : '') + '، ويُشار إليه في هذا العقد بـ"' + p1label + '".' },
+      { kind:'p', text:'ثانيًا: ' + val(a,p2.name) + (str(a[p2.id]) ? ' — رقم ' + str(a[p2.id]) : '') + '، ويُشار إليه في هذا العقد بـ"' + p2label + '".' },
+      { kind:'p', text:'وبعد أن أقر الطرفان بأهليتهما القانونية الكاملة للتعاقد، اتفقا على ما يلي:' }
+    ];
+  }
+
+  function finish(clauses, signatureLines) {
+    var out = [];
+    clauses.forEach(function (text, i) {
+      out.push({ kind:'clause', heading:'البند ' + AR_NUM[i], text:text });
+    });
+    out.push({ kind:'p', text:'وحرر هذا العقد من نسختين أصليتين، بيد كل طرفٍ نسخة للعمل بموجبها عند الحاجة.' });
+    out.push({ kind:'sign', lines: signatureLines });
+    out.push({ kind:'note', text:'هذا نموذج استرشادي أُنشئ بواسطة "عقدي" ولا يُغني عن مراجعة محامٍ مختص قبل التوقيع.' });
+    return out;
+  }
+
+  var BUILDERS = {
+    services: function (a) {
+      var parts = preamble('عقد تقديم خدمات', 'مقدم الخدمة',
+        {name:'providerName', id:'providerId'}, 'العميل', {name:'clientName', id:'clientId'}, a);
+      var clauses = [
+        'يقوم مقدم الخدمة بتنفيذ الأعمال التالية لصالح العميل: ' + val(a,'serviceDesc') + '، وذلك وفق المواصفات المتفق عليها بين الطرفين وبما يتوافق مع أصول المهنة.',
+        'مدة التنفيذ ' + val(a,'durationDays') + ' يومًا تبدأ من تاريخ توقيع هذا العقد، ما لم يتفق الطرفان كتابةً على خلاف ذلك.',
+        'اتفق الطرفان على أن المقابل الإجمالي للخدمات هو ' + money(a.fee) + ' جنيهًا مصريًا، يُسدد على النحو التالي: ' + val(a,'paymentTerms') + '.',
+        str(a.revisions) ? 'يلتزم مقدم الخدمة بإجراء عدد ' + str(a.revisions) + ' من مرات التعديل دون مقابل إضافي، وأي تعديلات تتجاوز ذلك تُحسب باتفاق مستقل بين الطرفين.' : null,
+        'يلتزم العميل بتوفير ما يطلبه مقدم الخدمة من بيانات ومستندات لازمة لتنفيذ الأعمال في موعدها، وأي تأخير من العميل في ذلك يُمدد مدة التنفيذ بمثله.',
+        'يلتزم مقدم الخدمة بالحفاظ على سرية ما يطلع عليه من معلومات العميل بمناسبة تنفيذ هذا العقد، ولا يجوز له إفشاؤها لطرف ثالث دون موافقة كتابية.',
+        'لا يجوز لأي من الطرفين التنازل عن هذا العقد لطرف ثالث دون موافقة كتابية مسبقة من الطرف الآخر.',
+        'تخضع جميع النزاعات الناشئة عن هذا العقد للقانون المصري، وتختص محاكم محافظة ' + val(a,'city') + ' بنظر أي نزاع يتعلق به.'
+      ];
+      return parts.concat(finish(clauses.filter(Boolean), ['توقيع مقدم الخدمة: ______________', 'توقيع العميل: ______________']));
+    },
+
+    rent: function (a) {
+      var parts = preamble('عقد إيجار وحدة سكنية', 'المؤجر',
+        {name:'landlordName', id:'landlordId'}, 'المستأجر', {name:'tenantName', id:'tenantId'}, a);
+      var clauses = [
+        'أجّر المؤجر إلى المستأجر العين المبينة أدناه: ' + val(a,'propertyAddress') + (str(a.propertyDesc) ? ' — ' + str(a.propertyDesc) : '') + '، وذلك لاستخدامها في الغرض السكني فقط.',
+        'مدة هذا العقد ' + val(a,'durationMonths') + ' شهرًا تبدأ اعتبارًا من ' + val(a,'startDate') + '، وتنتهي بانتهائها دون حاجة إلى إنذار أو إخطار ما لم يتفق كتابةً على التجديد.',
+        'اتفق الطرفان على أن القيمة الإيجارية الشهرية هي ' + money(a.rentAmount) + ' جنيهًا مصريًا، تُسدد مقدمًا في أول كل شهر.',
+        Number(a.deposit) > 0 ? 'أقر المستأجر بسداد مبلغ ' + money(a.deposit) + ' جنيهًا مصريًا كتأمين، يُرد إليه عند انتهاء العقد ورد العين بالحالة التي استلمها عليها، بعد خصم ما يكون مستحقًا عليه.' : null,
+        'المرافق (الكهرباء والمياه والغاز): ' + val(a,'utilities') + '، ويلتزم المستأجر بسداد ما يترتب عليه من مستحقات حسب الاتفاق.',
+        'يلتزم المستأجر باستعمال العين في الغرض المتفق عليه فقط، والمحافظة عليها، وعدم إجراء أي تعديل فيها دون موافقة كتابية من المؤجر، ولا يجوز له التأجير من الباطن أو التنازل عن الإيجار لطرف ثالث دون موافقة كتابية.',
+        'يحق للمؤجر فسخ العقد دون حكم قضائي إذا تأخر المستأجر عن سداد الأجرة، أو استعمل العين في غير الغرض المتفق عليه، أو أخلّ بالتزام جوهري من التزاماته.',
+        'تخضع جميع النزاعات الناشئة عن هذا العقد للقانون المصري، وتختص محاكم محافظة ' + val(a,'city') + ' بنظر أي نزاع يتعلق به.'
+      ];
+      return parts.concat(finish(clauses.filter(Boolean), ['توقيع المؤجر: ______________', 'توقيع المستأجر: ______________']));
+    },
+
+    nda: function (a) {
+      var mutual = str(a.mutual).indexOf('متبادل') === 0;
+      var parts = preamble('اتفاقية عدم إفصاح والتزام بالسرية', 'الطرف الأول',
+        {name:'discloserName', id:'discloserId'}, 'الطرف الثاني', {name:'recipientName', id:'recipientId'}, a);
+      var scope = mutual
+        ? 'يلتزم كلٌّ من الطرفين تجاه الآخر بالحفاظ على سرية جميع المعلومات المتبادلة بينهما'
+        : 'يلتزم الطرف الثاني (المتلقي) بالحفاظ على سرية جميع المعلومات التي يفصح عنها الطرف الأول';
+      var clauses = [
+        'بغرض ' + val(a,'purpose') + '، قد يفصح ' + (mutual ? 'الطرفان' : 'الطرف الأول') + ' عن معلومات ذات طبيعة سرية، سواء كانت مكتوبة أو شفهية أو إلكترونية، بما في ذلك البيانات التجارية والفنية والمالية وخطط العمل.',
+        scope + ' بمناسبة هذا الغرض، وعدم إفشائها لأي طرف ثالث دون موافقة كتابية مسبقة، وعدم استخدامها إلا في حدود الغرض المتفق عليه.',
+        'لا تُعد من المعلومات السرية: المعلومات المتاحة للجمهور دون إخلال بهذا الاتفاق، أو التي كان الطرف المتلقي يعلمها قبل الإفصاح، أو التي يُلزمه القانون أو سلطة قضائية مختصة بإفشائها.',
+        'يظل الالتزام بالسرية ساريًا لمدة ' + val(a,'durationYears') + ' سنة/سنوات من تاريخ توقيع هذا الاتفاق، ولو انتهى التعاون بين الطرفين.',
+        'عند انتهاء الغرض أو بناءً على طلب الطرف المُفصح، يلتزم المتلقي برد أو إتلاف جميع نسخ المعلومات السرية التي بحوزته.',
+        'يُقر الطرفان بأن الإخلال بهذا الاتفاق يوجب التعويض العادل عما يترتب عليه من أضرار، مع عدم الإخلال بأي حقوق أخرى مقررة قانونًا.',
+        'تخضع جميع النزاعات الناشئة عن هذا الاتفاق للقانون المصري، وتختص محاكم محافظة ' + val(a,'city') + ' بنظر أي نزاع يتعلق به.'
+      ];
+      return parts.concat(finish(clauses, ['توقيع الطرف الأول: ______________', 'توقيع الطرف الثاني: ______________']));
+    },
+
+    partnership: function (a) {
+      var parts = preamble('عقد شراكة', 'الشريك الأول',
+        {name:'partner1Name', id:'partner1Id'}, 'الشريك الثاني', {name:'partner2Name', id:'partner2Id'}, a);
+      var clauses = [
+        'اتفق الشريكان على تأسيس شراكة فيما بينهما تحت اسم "' + val(a,'businessName') + '" لغرض مزاولة نشاط: ' + val(a,'businessActivity') + '، وفق أحكام هذا العقد والقانون المصري.',
+        'رأس مال الشراكة ' + money(a.capital) + ' جنيهًا مصريًا، موزعًا بين الشريكين على النحو التالي: الشريك الأول بنسبة ' + val(a,'share1') + '%، والشريك الثاني بنسبة ' + val(a,'share2') + '%.',
+        'تُوزع الأرباح والخسائر بين الشريكين ' + val(a,'profitSplit') + '، وتُجرى التوزيعات وفق حسابات دورية يطلع عليها الطرفان.',
+        'يتولى الشريكان إدارة النشاط بالاتفاق المشترك، ولا يجوز لأي منهما إبرام تصرف يتجاوز حدود الإدارة المعتادة دون موافقة الشريك الآخر كتابةً.',
+        'يلتزم كل شريك بعدم مزاولة نشاط منافس لنشاط الشراكة لحسابه الخاص أو لحساب الغير طوال مدة الشراكة دون موافقة الشريك الآخر.',
+        'لا يجوز لأي شريك التنازل عن حصته لطرف ثالث قبل عرضها على شريكه بذات الشروط، ويكون للشريك أولوية الشراء خلال ثلاثين يومًا من إخطاره كتابةً.',
+        'تُحل الشراكة باتفاق الشريكين كتابةً، أو بانتهاء الغرض منها، مع إجراء التصفية وتوزيع صافي الأصول على الشريكين بنسبة حصصهما بعد سداد الالتزامات.',
+        'تخضع جميع النزاعات الناشئة عن هذا العقد للقانون المصري، وتختص محاكم محافظة ' + val(a,'city') + ' بنظر أي نزاع يتعلق به.'
+      ];
+      return parts.concat(finish(clauses, ['توقيع الشريك الأول: ______________', 'توقيع الشريك الثاني: ______________']));
+    },
+
+    employment: function (a) {
+      var parts = preamble('عقد عمل محدد المدة', 'صاحب العمل',
+        {name:'employerName', id:'employerId'}, 'الموظف', {name:'employeeName', id:'employeeId'}, a);
+      var clauses = [
+        'يلتزم الموظف بالعمل لدى صاحب العمل في وظيفة "' + val(a,'jobTitle') + '"، وطبيعة العمل ومهامه: ' + val(a,'jobDesc') + '، وذلك وفق توجيهات صاحب العمل وأنظمته المعتمدة.',
+        'مدة هذا العقد ' + val(a,'durationMonths') + ' شهرًا تبدأ اعتبارًا من ' + val(a,'startDate') + '، وتنتهي بانتهائها ما لم يتفق الطرفان كتابةً على التجديد.',
+        Number(a.probationMonths) > 0 ? 'يوضع الموظف تحت التجربة لمدة ' + str(a.probationMonths) + ' شهرًا من بدء العمل، ويجوز لصاحب العمل إنهاء العقد خلالها دون مكافأة، وبما لا يتجاوز الحد الأقصى القانوني لفترة التجربة.' : null,
+        'يتقاضى الموظف راتبًا شهريًا قدره ' + money(a.salary) + ' جنيهًا مصريًا، يُصرف في المواعيد المعتمدة لدى صاحب العمل، ويستحق ما يقرره القانون من مزايا وتأمينات.',
+        'يلتزم الموظف بمواعيد العمل وأنظمة صاحب العمل الداخلية، وبالحفاظ على أسرار العمل وعدم إفشائها أثناء العقد وبعد انتهائه.',
+        'ينتهي العقد بانتهاء مدته، ويجوز إنهاؤه قبل ذلك وفق الأحوال المقررة في قانون العمل المصري، مع مراعاة حقوق الطرفين المقررة قانونًا.',
+        'تخضع جميع النزاعات الناشئة عن هذا العقد لقانون العمل المصري، وتختص محاكم محافظة ' + val(a,'city') + ' بنظر أي نزاع يتعلق به.'
+      ];
+      return parts.concat(finish(clauses.filter(Boolean), ['توقيع صاحب العمل: ______________', 'توقيع الموظف: ______________']));
+    }
+  };
+
+  function build(typeId, answers) {
+    var b = BUILDERS[typeId];
+    if (!b) return [];
+    return b(answers || {});
+  }
+
+  return { TYPES: TYPES, validate: validate, build: build, money: money };
+});
+</script>
+<script>/* عقدي - واجهة التطبيق. يعتمد على AqdiEngine (contracts.js). */
+(function () {
+  'use strict';
+  var E = window.AqdiEngine;
+  var LS_STATE = 'aqdi:state:v1';
+  var LS_DRAFTS = 'aqdi:drafts:v1';
+
+  var state = load(LS_STATE) || { type: 'services', answers: {} };
+  if (!E.TYPES[state.type]) state.type = 'services';
+  if (!state.answers) state.answers = {};
+
+  function load(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function persist() { save(LS_STATE, state); }
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+  function toast(msg, isErr) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = 'show' + (isErr ? ' err' : '');
+    setTimeout(function () { t.className = ''; }, 2600);
+  }
+
+  /* ---------- نوع العقد ---------- */
+  function renderTypePicker() {
+    var host = $('type-picker');
+    host.innerHTML = '';
+    Object.keys(E.TYPES).forEach(function (id) {
+      var t = E.TYPES[id];
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'type-card' + (id === state.type ? ' active' : '');
+      b.innerHTML = '<b>' + esc(t.name) + '</b><span>' + esc(t.desc) + '</span>';
+      b.addEventListener('click', function () { state.type = id; persist(); renderAll(); });
+      host.appendChild(b);
+    });
+  }
+
+  /* ---------- الحقول ---------- */
+  function renderForm() {
+    var t = E.TYPES[state.type];
+    var host = $('fields-form');
+    host.innerHTML = '';
+    t.fields.forEach(function (f) {
+      var wrap = document.createElement('div');
+      wrap.className = 'field';
+      var label = '<label>' + esc(f.label) + (f.required ? ' <i>*</i>' : '') + '</label>';
+      var v = state.answers[f.id] == null ? '' : state.answers[f.id];
+      var input;
+      if (f.type === 'textarea') {
+        input = '<textarea id="af-' + f.id + '" rows="3" placeholder="' + esc(f.placeholder || '') + '">' + esc(v) + '</textarea>';
+      } else if (f.type === 'select') {
+        input = '<select id="af-' + f.id + '"><option value="">اختر...</option>' +
+          f.options.map(function (o) { return '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') + '</select>';
+      } else {
+        input = '<input id="af-' + f.id + '" type="' + (f.type || 'text') + '" value="' + esc(v) + '" placeholder="' + esc(f.placeholder || '') + '">';
+      }
+      wrap.innerHTML = label + input;
+      var el = wrap.querySelector('#af-' + f.id);
+      var evt = f.type === 'select' ? 'change' : 'input';
+      el.addEventListener(evt, function () { state.answers[f.id] = el.value; persist(); render(); });
+      host.appendChild(wrap);
+    });
+  }
+
+  /* ---------- معاينة العقد ---------- */
+  function contractText(blocks) {
+    return blocks.map(function (b) {
+      if (b.kind === 'sign') return b.lines.join('\n');
+      return (b.heading ? b.heading + ': ' : '') + (b.text || '');
+    }).join('\n\n');
+  }
+
+  function render() {
+    var blocks = E.build(state.type, state.answers);
+    var html = blocks.map(function (b) {
+      switch (b.kind) {
+        case 'title': return '<h2 class="c-title">' + esc(b.text) + '</h2>';
+        case 'clause': return '<div class="c-clause"><h3>' + esc(b.heading) + '</h3><p>' + esc(b.text) + '</p></div>';
+        case 'sign': return '<div class="c-sign">' + b.lines.map(function (l) { return '<span>' + esc(l) + '</span>'; }).join('') + '</div>';
+        case 'note': return '<div class="c-note">' + esc(b.text) + '</div>';
+        default: return '<p class="c-p">' + esc(b.text) + '</p>';
+      }
+    }).join('');
+    $('contract-paper').innerHTML = html;
+    $('stat-type').textContent = E.TYPES[state.type].name;
+  }
+
+  function renderAll() { renderTypePicker(); renderForm(); render(); }
+
+  /* ---------- إجراءات ---------- */
+  $('btn-print').addEventListener('click', function () {
+    var errors = E.validate(state.type, state.answers);
+    if (errors.length) { toast(errors[0], true); return; }
+    window.print();
+  });
+
+  $('btn-copy').addEventListener('click', function () {
+    var txt = contractText(E.build(state.type, state.answers));
+    function done() { toast('نُسخ نص العقد — يمكنك لصقه في Word'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallback(); });
+    } else fallback();
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = txt; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { toast('تعذر النسخ — حدد النص يدويًا', true); }
+      document.body.removeChild(ta);
+    }
+  });
+
+  $('btn-new').addEventListener('click', function () {
+    state = { type: state.type, answers: {} };
+    persist(); renderAll();
+    toast('عقد جديد — الحقول فارغة');
+  });
+
+  /* ---------- مسودات ---------- */
+  function drafts() { return load(LS_DRAFTS) || []; }
+  $('btn-save-draft').addEventListener('click', function () {
+    var errors = E.validate(state.type, state.answers);
+    if (errors.length) { toast(errors[0], true); return; }
+    var list = drafts();
+    var snap = JSON.parse(JSON.stringify(state));
+    snap.savedAt = new Date().toISOString();
+    list.unshift(snap);
+    save(LS_DRAFTS, list.slice(0, 30));
+    renderDrafts();
+    toast('اتحفظ في المسودات');
+  });
+
+  function renderDrafts() {
+    var host = $('drafts');
+    var list = drafts();
+    if (!list.length) { host.innerHTML = '<p class="muted">لا مسودات محفوظة بعد.</p>'; return; }
+    host.innerHTML = '';
+    list.forEach(function (d, idx) {
+      var t = E.TYPES[d.type] ? E.TYPES[d.type].name : d.type;
+      var who = d.answers.clientName || d.answers.tenantName || d.answers.recipientName || d.answers.partner2Name || d.answers.employeeName || '';
+      var row = document.createElement('div');
+      row.className = 'draft-row';
+      row.innerHTML = '<span><b>' + esc(t) + '</b>' + (who ? ' — ' + esc(who) : '') + '</span>' +
+        '<span><button type="button" class="mini d-open">فتح</button> <button type="button" class="mini d-del">حذف</button></span>';
+      row.querySelector('.d-open').addEventListener('click', function () {
+        state = { type: d.type, answers: d.answers || {} };
+        persist(); renderAll(); toast('فُتحت المسودة');
+      });
+      row.querySelector('.d-del').addEventListener('click', function () {
+        var l = drafts(); l.splice(idx, 1); save(LS_DRAFTS, l); renderDrafts();
+      });
+      host.appendChild(row);
+    });
+  }
+
+  renderAll();
+  renderDrafts();
+})();
+</script>
+<script>
+(function () {
+  if (!('serviceWorker' in navigator)) return;
+  var okHost = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!okHost) return;
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').then(function () {
+      document.documentElement.setAttribute('data-sw', 'registered');
+    }).catch(function () {
+      document.documentElement.setAttribute('data-sw', 'failed');
+    });
+  });
+})();
+</script>
+</body>
+</html>
